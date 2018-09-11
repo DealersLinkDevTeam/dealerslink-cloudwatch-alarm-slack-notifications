@@ -28,7 +28,7 @@ class SlackNotifier {
   formatFields(str) {
     const fields = [];
     let severity = severities.good;
-    let message, innerMessage, deploymentOverview;
+    let message, innerMessage;
 
     try {
       message = JSON.parse(str);
@@ -109,7 +109,6 @@ class SlackNotifier {
     };
 
     const { fields, severity } = this.formatFields(sns.Message);
-    const messages = sns.Message;
 
     let color = '#36a64f';
     if ((severity & severities.danger) === severities.danger) {
