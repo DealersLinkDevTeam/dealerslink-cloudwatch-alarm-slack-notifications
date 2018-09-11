@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: dealerslink-codedeploy-slack-notification - Delivers CodeDeploy Notifications
+  via SNS triggers to a Slack Webhook. Powered by CloudFormation, SNS, and Lambda
+Resources:
+  Function:
+    Properties:
+      CodeUri: s3://dealerslink-code-deployments/dealerslink-cloudwatch-alarm-slack-notifications/4766531d5c93d941c95bfe7c478cd105
+      Handler: index.handler
+      MemorySize: 128
+      Role:
+        Fn::GetAtt:
+        - SNSLambdaFunctionRole
+        - Arn
+      Runtime: nodejs8.10
+      Timeout: 60
+    Type: AWS::Serverless::Function
+  SNSInvokePermission:
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: Function
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: Topic
+    Type: AWS::Lambda::Permission
+  SNSLambdaFunctionRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Effect: Allow
+            Resource: '*'
+          Version: '2012-10-17'
+        PolicyName: logs
+    Type: AWS::IAM::Role
+  Topic:
+    DependsOn: Function
+    Properties:
+      Subscription:
+      - Endpoint:
+          Fn::GetAtt:
+          - Function
+          - Arn
+        Protocol: lambda
+    Type: AWS::SNS::Topic
+Transform: AWS::Serverless-2016-10-31
