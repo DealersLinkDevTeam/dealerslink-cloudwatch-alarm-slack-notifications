@@ -28,17 +28,24 @@ class SlackNotifier {
   formatFields(str) {
     const fields = [];
     let severity = severities.good;
-    let message, deploymentOverview;
+    let message, innerMessage, deploymentOverview;
 
     try {
       message = JSON.parse(str);
+      try {
+        innerMessage = JSON.parse(message.Message);
+      } catch (ex) {
+        innerMessage = message.Message;
+      }
     } catch (ex) {
       message = str;
+      innerMessage = '';
     }
 
+
     // Make sure we have a valid response
-    if (message) {
-      let state = message.NewStateValue;
+    if (innerMessage) {
+      let state = innerMessage.NewStateValue;
       switch (state) {
         case 'ALARM': {
           severity = severities.danger;
@@ -56,19 +63,21 @@ class SlackNotifier {
           severity = severities.warning;
           break;
         }
-
       }
-      if (typeof message === 'object') {
+
+      if (typeof innerMessage === 'object') {
         fields.push(
-          { title: 'Name', value: message.AlarmName, short: true },
-          { title: 'Status', value: message.NewStateValue, short: true },
-          { title: 'Description', value: message.AlarmDescription, short: true },
-          { title: 'Last Status', value: message.OldStateValue, short: true },
-          { title: 'State Time', value: message.StateChangeTime, short: true },
-          { title: 'Region', value: message.Region, short: true },
-          { title: 'Reason', value: message.NewStateReason, short: false }
+          { title: 'Name', value: innerMessage.AlarmName, short: true },
+          { title: 'Status', value: innerMessage.NewStateValue, short: true },
+          { title: 'Description', value: innerMessage.AlarmDescription, short: true },
+          { title: 'Last Status', value: innerMessage.OldStateValue, short: true },
+          { title: 'State Time', value: innerMessage.StateChangeTime, short: true },
+          { title: 'Region', value: innerMessage.Region, short: true },
+          { title: 'Reason', value: innerMessage.NewStateReason, short: false }
         );
       } else if (typeof message === 'string') {
+        fields.push({ title: 'Message', value: message, short: false });
+      } else if (typeof innerMessage === 'string') {
         fields.push({ title: 'Message', value: message, short: false });
       }
     }
