@@ -1,6 +1,6 @@
 {
   "name": "dealerslink-cloudwatch-alarm-slack-notifications",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An AWS Lambda-SNS function that reports CloudWatch Alarm statuses to Slack",
   "main": "index.js",
   "config": {
