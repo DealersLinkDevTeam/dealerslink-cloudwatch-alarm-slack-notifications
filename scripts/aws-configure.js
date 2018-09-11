@@ -120,7 +120,7 @@ function setupQuestions() {
       type: 'input',
       name: 'stack',
       message: 'Enter a CloudFormation Stack name:',
-      default: getDefault(options.stack, 'CodeDeploySlackNotifications'),
+      default: getDefault(options.stack, 'CloudWatchAlarmSlackNotifications'),
       validate: (v) => {
         if ((/^[a-zA-Z][a-zA-Z0-9]*$/).test(v)) {
           return true;
@@ -138,7 +138,7 @@ function setupQuestions() {
       type: 'input',
       name: 'bucket',
       message: 'Enter a unique AWS S3 Bucket name for deployment:',
-      default: getDefault(options.bucket, 'codedeploy-slack-notification-bucket'),
+      default: getDefault(options.bucket, 'cloudwatch-alarm-slack-notification-bucket'),
       validate: (v) => {
         if ((/^[a-z0-9_/-]*$/).test(v)) {
           return true;
